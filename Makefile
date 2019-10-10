@@ -14,6 +14,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS) $(LIBS)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS)
+	clang -emit-llvm -S -O -o $(OBJ_DIR)/write.ll $(SRC_DIR)/write.c
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp 
 	@if [ ! -d $(OBJ_DIR) ]; \

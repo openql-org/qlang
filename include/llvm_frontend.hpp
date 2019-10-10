@@ -9,7 +9,7 @@
 #include "llvm_table.hpp"
 #include "token.hpp"
 
-namespace pl0 {
+namespace qlang {
 class Frontend {
 public:
   Frontend(const std::string &path);
@@ -61,6 +61,6 @@ private:
 
   Token cur_token;
   Token peek_token;
-  pl0llvm::Table ident_table;
+  qlangllvm::Table ident_table;
 };
-} // namespace pl0
+} // namespace qlang

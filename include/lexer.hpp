@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace pl0 {
+namespace qlang {
 class Token;
 enum class TokenType;
 
@@ -38,4 +38,4 @@ private:
   size_t head = 0;
   std::vector<Token> buffer;
 };
-} // namespace pl0
+} // namespace qlang

@@ -8,7 +8,7 @@
 #include "table.hpp"
 #include "token.hpp"
 
-namespace pl0 {
+namespace qlang {
 class Compiler {
 public:
   Compiler(const std::string &path) : lexer(path) {
@@ -47,4 +47,4 @@ private:
   Token peek_token;
   size_t cur_func_id;
 };
-} // namespace pl0
+} // namespace qlang

@@ -1,7 +1,7 @@
 #include "lexer.hpp"
 #include "token.hpp"
 
-using namespace pl0;
+using namespace qlang;
 
 std::map<std::string, TokenType> Lexer::keywords;
 
@@ -144,7 +144,7 @@ Token Lexer::read_ident() {
   while (is_ident_piece(peekc())) {
     ident.push_back(readc());
   }
-
+    
   auto itr = keywords.find(ident);
   if (itr == keywords.end()) {
     return std::move(Token(std::move(ident)));
@@ -162,8 +162,6 @@ void Lexer::init_keywords() {
   keywords["const"] = TokenType::Const;
   keywords["var"] = TokenType::Var;
   keywords["function"] = TokenType::Function;
-  keywords["begin"] = TokenType::Begin;
-  keywords["end"] = TokenType::End;
   keywords["if"] = TokenType::If;
   keywords["then"] = TokenType::Then;
   keywords["while"] = TokenType::While;

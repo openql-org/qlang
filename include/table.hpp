@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace pl0 {
+namespace qlang {
 enum class IdType {
   Const,
   Var,

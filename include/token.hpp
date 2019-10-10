@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace pl0 {
+namespace qlang {
 enum class TokenType {
   Integer,
   Ident,
@@ -11,8 +11,6 @@ enum class TokenType {
   Const,
   Var,
   Function,
-  Begin,
-  End,
   If,
   Then,
   While,
@@ -75,10 +73,6 @@ static std::ostream &operator<<(std::ostream &out, const TokenType type) {
     return out << "Var";
   case TokenType::Function:
     return out << "Function";
-  case TokenType::Begin:
-    return out << "Begin";
-  case TokenType::End:
-    return out << "End";
   case TokenType::If:
     return out << "If";
   case TokenType::Then:

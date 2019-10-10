@@ -3,7 +3,7 @@
 #include "instruction.hpp"
 #include <vector>
 
-namespace pl0 {
+namespace qlang {
 class VM {
 public:
   VM(const Program &program) : program(program) {

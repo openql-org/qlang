@@ -1,4 +1,4 @@
-#include "llvm/IR/LegacyPassManager.h"
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/IRPrintingPasses.h>
 #include <llvm/IR/ValueSymbolTable.h>
@@ -8,7 +8,7 @@
 
 #include "llvm_frontend.hpp"
 
-using namespace pl0;
+using namespace qlang;
 
 Frontend::Frontend(const std::string &path)
     : lexer(path), context(), module(new llvm::Module("top", context)),
@@ -37,7 +37,7 @@ void Frontend::compile() {
       funcType, llvm::Function::ExternalLinkage, "main", module);
   auto *entry = llvm::BasicBlock::Create(context, "entrypoint", mainFunc);
   block(mainFunc);
-  builder.CreateRet(builder.getInt64(1));
+  builder.CreateRet(builder.getInt64(0));
 }
 
 void Frontend::block(llvm::Function *func) {
@@ -173,7 +173,7 @@ void Frontend::functionDecl() {
 void Frontend::statement() {
   size_t backpatch_target;
   size_t start_at;
-  const pl0llvm::IdInfo *info;
+  const qlangllvm::IdInfo *info;
 
   llvm::Value *val;
   llvm::BasicBlock *stash;
@@ -182,19 +182,19 @@ void Frontend::statement() {
   case TokenType::Ident:
     statementAssign();
     return;
-  case TokenType::Begin:
+  case TokenType::CurlyBracesL:
     nextToken();
     while (true) {
       statement();
       if (cur_token.type == TokenType::Semicolon) {
         takeToken(TokenType::Semicolon);
         // continue;
-      } else if (cur_token.type == TokenType::End) {
-        takeToken(TokenType::End);
+      } else if (cur_token.type == TokenType::CurlyBracesR) {
+        takeToken(TokenType::CurlyBracesR);
         break;
       } else {
         lexer.print_head();
-        parseError(TokenType::End, cur_token.type);
+        parseError(TokenType::CurlyBracesR, cur_token.type);
       }
     }
     return;
@@ -224,7 +224,7 @@ void Frontend::statement() {
 void Frontend::statementAssign() {
   const auto &info = ident_table.find(cur_token.ident);
   llvm::Value *assignee;
-  if (info.type == pl0llvm::IdType::Var) {
+  if (info.type == qlangllvm::IdType::Var) {
     assignee = info.val;
   } else {
     error("variable is expected but it is not variable");
@@ -380,16 +380,16 @@ llvm::Value *Frontend::factorIdent() {
   takeToken(TokenType::Ident);
 
   switch (val.type) {
-  case pl0llvm::IdType::QInt:
+  case qlangllvm::IdType::QInt:
     // TODO: something
     return val.val;
-  case pl0llvm::IdType::Const:
+  case qlangllvm::IdType::Const:
     return val.val;
-  case pl0llvm::IdType::Var:
+  case qlangllvm::IdType::Var:
     return builder.CreateLoad(val.val);
-  case pl0llvm::IdType::Param:
+  case qlangllvm::IdType::Param:
     error("Param ident can not be factor");
-  case pl0llvm::IdType::Function:
+  case qlangllvm::IdType::Function:
     takeToken(TokenType::ParenL);
     std::vector<llvm::Value *> args;
     while (cur_token.type != TokenType::ParenR) {
@@ -415,7 +415,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  pl0::Frontend frontend(argv[1]);
+  qlang::Frontend frontend(argv[1]);
   frontend.compile();
 
   llvm::legacy::PassManager pm;

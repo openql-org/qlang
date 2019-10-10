@@ -15,7 +15,7 @@ static void undefinedError(const std::string &ident) {
   exit(1);
 }
 
-static void parseError(pl0::TokenType expect, pl0::TokenType actual) {
+static void parseError(qlang::TokenType expect, qlang::TokenType actual) {
   std::cerr << "parse error: " << expect << " is expected, but actual is "
             << actual << std::endl;
   exit(1);

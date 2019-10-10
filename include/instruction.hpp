@@ -3,7 +3,7 @@
 #include <ostream>
 #include <vector>
 
-namespace pl0 {
+namespace qlang {
 enum class Instruction {
   Load = 0,
   Store,
@@ -116,4 +116,4 @@ static size_t operand_size(Instruction inst) {
 }
 
 void print_program(const Program &program);
-} // namespace pl0
+} // namespace qlang
