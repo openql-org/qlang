@@ -15,6 +15,7 @@ enum class TokenType {
   Then,
   While,
   Do,
+  Main,
   Return,
   Write,
   Writeln,
@@ -81,6 +82,8 @@ static std::ostream &operator<<(std::ostream &out, const TokenType type) {
     return out << "While";
   case TokenType::Do:
     return out << "Do";
+  case TokenType::Main:
+    return out << "Main";
   case TokenType::Return:
     return out << "Return";
   case TokenType::Write:

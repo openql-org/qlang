@@ -166,9 +166,11 @@ void Lexer::init_keywords() {
   keywords["then"] = TokenType::Then;
   keywords["while"] = TokenType::While;
   keywords["do"] = TokenType::Do;
+  keywords["main"] = TokenType::Main;
   keywords["return"] = TokenType::Return;
   keywords["write"] = TokenType::Write;
   keywords["writeln"] = TokenType::Writeln;
   keywords["odd"] = TokenType::Odd;
+  keywords["int"] = TokenType::Integer;
   keywords["qint"] = TokenType::Qint;
 }

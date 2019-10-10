@@ -68,6 +68,7 @@ void Frontend::block(llvm::Function *func) {
   for (const auto &var : vars) {
     auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
     ident_table.appendVar(var, alloca);
+    std::cout << "Global:" << var << std::endl;
   }
   statement();
   ident_table.leaveBlock();
@@ -174,9 +175,24 @@ void Frontend::statement() {
   size_t backpatch_target;
   size_t start_at;
   const qlangllvm::IdInfo *info;
+  std::vector<std::string> vars;
 
   llvm::Value *val;
   llvm::BasicBlock *stash;
+
+  while (true) {
+    if (cur_token.type == TokenType::Var) {
+      varDecl(&vars);
+    } else {
+      break;
+    }
+  }
+
+  for (const auto &var : vars) {
+    auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
+    ident_table.appendVar(var, alloca);
+    std::cout << "Stack:" << var << std::endl;
+  }
 
   switch (cur_token.type) {
   case TokenType::Ident:
