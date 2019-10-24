@@ -32,11 +32,14 @@ Frontend::Frontend(const std::string &path)
 }
 
 void Frontend::compile() {
+  /*
   auto *funcType = llvm::FunctionType::get(builder.getInt64Ty(), false);
   auto *mainFunc = llvm::Function::Create(
       funcType, llvm::Function::ExternalLinkage, "main", module);
   auto *entry = llvm::BasicBlock::Create(context, "entrypoint", mainFunc);
   block(mainFunc);
+  */
+  block(nullptr);
   builder.CreateRet(builder.getInt64(0));
 }
 
@@ -55,23 +58,25 @@ void Frontend::block(llvm::Function *func) {
     }
   }
 
-  curFunc = func;
-  builder.SetInsertPoint(&func->getEntryBlock());
-  auto itr = func->arg_begin();
-  for (size_t i = 0; i < func->arg_size(); i++) {
-    auto *alloca =
-        builder.CreateAlloca(builder.getInt64Ty(), 0, itr->getName());
-    builder.CreateStore(itr, alloca);
-    ident_table.appendVar(itr->getName(), alloca);
-    itr++;
+  if (func != nullptr) {
+    curFunc = func;
+    builder.SetInsertPoint(&func->getEntryBlock());
+    auto itr = func->arg_begin();
+    for (size_t i = 0; i < func->arg_size(); i++) {
+      auto *alloca =
+          builder.CreateAlloca(builder.getInt64Ty(), 0, itr->getName());
+      builder.CreateStore(itr, alloca);
+      ident_table.appendVar(itr->getName(), alloca);
+      itr++;
+    }
+    for (const auto &var : vars) {
+      auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
+      ident_table.appendVar(var, alloca);
+      std::cout << "Global:" << var << std::endl;
+    }
+    statement();
+    ident_table.leaveBlock();
   }
-  for (const auto &var : vars) {
-    auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
-    ident_table.appendVar(var, alloca);
-    std::cout << "Global:" << var << std::endl;
-  }
-  statement();
-  ident_table.leaveBlock();
 }
 
 void Frontend::constDecl() {
@@ -128,47 +133,81 @@ void Frontend::varDecl(std::vector<std::string> *vars) {
 
 void Frontend::functionDecl() {
   takeToken(TokenType::Function);
-  if (cur_token.type != TokenType::Ident) {
-    parseError(TokenType::Ident, cur_token.type);
-  }
-  std::string func_name = std::move(cur_token.ident);
-  nextToken();
+  std::cout << cur_token.type << std::endl;
+  if (cur_token.type == TokenType::Main) {
+    auto *funcType = llvm::FunctionType::get(builder.getInt64Ty(), false);
+    auto *mainFunc = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", module);
+    auto *entry = llvm::BasicBlock::Create(context, "entrypoint", mainFunc);
 
-  std::vector<std::string> params;
-  takeToken(TokenType::ParenL);
-  while (true) {
-    if (cur_token.type != TokenType::Ident) {
-      break;
-    }
-
-    params.push_back(cur_token.ident);
     nextToken();
-    if (cur_token.type == TokenType::Colon) {
+
+    std::vector<std::string> params;
+    takeToken(TokenType::ParenL);
+    while (true) {
+      if (cur_token.type != TokenType::Ident) {
+        break;
+      }
+
+      params.push_back(cur_token.ident);
       nextToken();
-      // continue;
-    } else {
-      break;
+      if (cur_token.type == TokenType::Colon) {
+        nextToken();
+        // continue;
+      } else {
+        break;
+      }
     }
+    takeToken(TokenType::ParenR);
+
+    auto itr = mainFunc->arg_begin();
+    for (size_t i = 0; i < params.size(); i++) {
+      ident_table.appendParam(params[i]);
+      itr->setName(params[i]);
+      itr++;
+    }
+
+    block(mainFunc);
+  } else if (cur_token.type != TokenType::Ident) {
+    parseError(TokenType::Ident, cur_token.type);
+  } else {
+    std::string func_name = std::move(cur_token.ident);
+    nextToken();
+
+    std::vector<std::string> params;
+    takeToken(TokenType::ParenL);
+    while (true) {
+      if (cur_token.type != TokenType::Ident) {
+        break;
+      }
+
+      params.push_back(cur_token.ident);
+      nextToken();
+      if (cur_token.type == TokenType::Colon) {
+        nextToken();
+        // continue;
+      } else {
+        break;
+      }
+    }
+    takeToken(TokenType::ParenR);
+
+    std::vector<llvm::Type *> param_types(params.size(), builder.getInt64Ty());
+    auto *funcType =
+        llvm::FunctionType::get(builder.getInt64Ty(), param_types, false);
+    auto *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage,
+                                        func_name, module);
+    auto *bblock = llvm::BasicBlock::Create(context, "entry", func);
+    ident_table.appendFunction(func_name, func);
+
+    auto itr = func->arg_begin();
+    for (size_t i = 0; i < params.size(); i++) {
+      ident_table.appendParam(params[i]);
+      itr->setName(params[i]);
+      itr++;
+    }
+
+    block(func);
   }
-  takeToken(TokenType::ParenR);
-
-  std::vector<llvm::Type *> param_types(params.size(), builder.getInt64Ty());
-  auto *funcType =
-      llvm::FunctionType::get(builder.getInt64Ty(), param_types, false);
-  auto *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage,
-                                      func_name, module);
-  auto *bblock = llvm::BasicBlock::Create(context, "entry", func);
-  ident_table.appendFunction(func_name, func);
-
-  auto itr = func->arg_begin();
-  for (size_t i = 0; i < params.size(); i++) {
-    ident_table.appendParam(params[i]);
-    itr->setName(params[i]);
-    itr++;
-  }
-
-  block(func);
-  takeToken(TokenType::Semicolon);
 }
 
 void Frontend::statement() {

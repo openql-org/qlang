@@ -1,15 +1,8 @@
-int main() {
-  const m = 7, n = 85;
+func main() {
   var x, y;
-  
-  x := m;
-  y := n;
-  write x;
-  write y;
-  writeln;
+  x := 7;
+  y := 85;
 
-  x := 84;
-  y := 36;
   write x;
   write y;
   writeln;

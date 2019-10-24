@@ -161,7 +161,7 @@ void Lexer::init_keywords() {
   }
   keywords["const"] = TokenType::Const;
   keywords["var"] = TokenType::Var;
-  keywords["function"] = TokenType::Function;
+  keywords["func"] = TokenType::Function;
   keywords["if"] = TokenType::If;
   keywords["then"] = TokenType::Then;
   keywords["while"] = TokenType::While;
