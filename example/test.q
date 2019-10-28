@@ -2,11 +2,12 @@ func main() {
   var x, y;
   qint z;
 
-  x := 7;
-  y := 85;
-  z := 0;
+  x = 10;
+  y = 20;
+  z = 0;
 
-  write x;
-  write y;
+  if x == 10 then
+    write x;
+
   writeln;
 }

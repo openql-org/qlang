@@ -67,7 +67,6 @@ void Frontend::block(llvm::Function *func) {
     for (const auto &var : vars) {
       auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
       ident_table.appendVar(var, alloca);
-      std::cout << "Global:" << var << std::endl;
     }
     statement();
     ident_table.leaveBlock();
@@ -151,7 +150,7 @@ void Frontend::qintDecl(std::vector<std::string> *vars) {
 
 void Frontend::functionDecl() {
   takeToken(TokenType::Function);
-  std::cout << cur_token << std::endl;
+
   if (cur_token.type == TokenType::Main) {
     auto *funcType = llvm::FunctionType::get(builder.getInt64Ty(), false);
     auto *mainFunc = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", module);
@@ -251,7 +250,6 @@ void Frontend::statement() {
     auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
     ident_table.appendVar(var, alloca);
   }
-  std::cout << cur_token << std::endl;
 
   switch (cur_token.type) {
   case TokenType::Ident:

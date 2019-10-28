@@ -55,7 +55,11 @@ Token Lexer::nextToken() {
     return std::move(Token(TokenType::Div));
   case '=':
     readc();
-    return std::move(Token(TokenType::Equal));
+    if (try_readc('=')) {
+      return std::move(Token(TokenType::Equal));
+    } else {
+      return std::move(Token(TokenType::Assign));
+    }
   case '<':
     readc();
     if (try_readc('=')) {
@@ -84,19 +88,13 @@ Token Lexer::nextToken() {
   case '{':
     readc();
     return std::move(Token(TokenType::CurlyBracesL));
-  case ':':
-    readc();
-    if (try_readc('=')) {
-      return std::move(Token(TokenType::Assign));
-    } else {
-      throw "'=' is expected, but it is not.";
-    }
   case ';':
     readc();
     return std::move(Token(TokenType::Semicolon));
   case ',':
     readc();
     return std::move(Token(TokenType::Colon));
+  case ':':
   default:
     throw "invalid char";
   }
