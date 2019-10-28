@@ -23,6 +23,7 @@ public:
 
   void constDecl();
   void varDecl(std::vector<std::string> *vars);
+  void qintDecl(std::vector<std::string> *vars);
   void functionDecl();
   void statement();
   void statementAssign();

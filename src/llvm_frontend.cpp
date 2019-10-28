@@ -32,13 +32,6 @@ Frontend::Frontend(const std::string &path)
 }
 
 void Frontend::compile() {
-  /*
-  auto *funcType = llvm::FunctionType::get(builder.getInt64Ty(), false);
-  auto *mainFunc = llvm::Function::Create(
-      funcType, llvm::Function::ExternalLinkage, "main", module);
-  auto *entry = llvm::BasicBlock::Create(context, "entrypoint", mainFunc);
-  block(mainFunc);
-  */
   block(nullptr);
   builder.CreateRet(builder.getInt64(0));
 }
@@ -51,6 +44,8 @@ void Frontend::block(llvm::Function *func) {
       constDecl();
     } else if (cur_token.type == TokenType::Var) {
       varDecl(&vars);
+    } else if (cur_token.type == TokenType::Qint) {
+      qintDecl(&vars);
     } else if (cur_token.type == TokenType::Function) {
       functionDecl();
     } else {
@@ -131,9 +126,32 @@ void Frontend::varDecl(std::vector<std::string> *vars) {
   }
 }
 
+
+void Frontend::qintDecl(std::vector<std::string> *vars) {
+  takeToken(TokenType::Qint);
+  while (true) {
+    if (cur_token.type != TokenType::Ident) {
+      parseError(TokenType::Ident, cur_token.type);
+    }
+
+    vars->push_back(cur_token.ident);
+    nextToken();
+
+    if (cur_token.type == TokenType::Colon) {
+      nextToken();
+      // continue;
+    } else if (cur_token.type == TokenType::Semicolon) {
+      nextToken();
+      break;
+    } else {
+      error("unexpected at qintDecl");
+    }
+  }
+}
+
 void Frontend::functionDecl() {
   takeToken(TokenType::Function);
-  std::cout << cur_token.type << std::endl;
+  std::cout << cur_token << std::endl;
   if (cur_token.type == TokenType::Main) {
     auto *funcType = llvm::FunctionType::get(builder.getInt64Ty(), false);
     auto *mainFunc = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", module);
@@ -222,6 +240,8 @@ void Frontend::statement() {
   while (true) {
     if (cur_token.type == TokenType::Var) {
       varDecl(&vars);
+    } else if (cur_token.type == TokenType::Qint) {
+      qintDecl(&vars);
     } else {
       break;
     }
@@ -230,8 +250,8 @@ void Frontend::statement() {
   for (const auto &var : vars) {
     auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
     ident_table.appendVar(var, alloca);
-    std::cout << "Stack:" << var << std::endl;
   }
+  std::cout << cur_token << std::endl;
 
   switch (cur_token.type) {
   case TokenType::Ident:
