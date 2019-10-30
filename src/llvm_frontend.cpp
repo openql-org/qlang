@@ -39,13 +39,15 @@ void Frontend::compile() {
 void Frontend::block(llvm::Function *func) {
   ident_table.enterBlock();
   std::vector<std::string> vars;
+  std::vector<std::string> qints;
+
   while (true) {
     if (cur_token.type == TokenType::Const) {
       constDecl();
     } else if (cur_token.type == TokenType::Var) {
       varDecl(&vars);
     } else if (cur_token.type == TokenType::Qint) {
-      qintDecl(&vars);
+      qintDecl(&qints);
     } else if (cur_token.type == TokenType::Function) {
       functionDecl();
     } else {
@@ -64,7 +66,7 @@ void Frontend::block(llvm::Function *func) {
       ident_table.appendVar(itr->getName(), alloca);
       itr++;
     }
-    for (const auto &var : vars) {
+    for (const auto &var : vars) {      
       auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
       ident_table.appendVar(var, alloca);
     }
@@ -126,14 +128,14 @@ void Frontend::varDecl(std::vector<std::string> *vars) {
 }
 
 
-void Frontend::qintDecl(std::vector<std::string> *vars) {
+void Frontend::qintDecl(std::vector<std::string> *qints) {
   takeToken(TokenType::Qint);
   while (true) {
     if (cur_token.type != TokenType::Ident) {
       parseError(TokenType::Ident, cur_token.type);
     }
 
-    vars->push_back(cur_token.ident);
+    qints->push_back(cur_token.ident);
     nextToken();
 
     if (cur_token.type == TokenType::Colon) {
@@ -232,6 +234,7 @@ void Frontend::statement() {
   size_t start_at;
   const qlangllvm::IdInfo *info;
   std::vector<std::string> vars;
+  std::vector<std::string> qints;
 
   llvm::Value *val;
   llvm::BasicBlock *stash;
@@ -240,7 +243,7 @@ void Frontend::statement() {
     if (cur_token.type == TokenType::Var) {
       varDecl(&vars);
     } else if (cur_token.type == TokenType::Qint) {
-      qintDecl(&vars);
+      qintDecl(&qints);
     } else {
       break;
     }
@@ -249,6 +252,12 @@ void Frontend::statement() {
   for (const auto &var : vars) {
     auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, var);
     ident_table.appendVar(var, alloca);
+  }
+
+  // TODO: for just a test qints registors.
+  for (const auto &qint : qints) {
+    auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, qint);
+    ident_table.appendQint(qint, alloca);
   }
 
   switch (cur_token.type) {
@@ -299,9 +308,12 @@ void Frontend::statementAssign() {
   llvm::Value *assignee;
   if (info.type == qlangllvm::IdType::Var) {
     assignee = info.val;
+  } else if (info.type == qlangllvm::IdType::Qint) {
+    assignee = info.val;
   } else {
     error("variable is expected but it is not variable");
   }
+
   nextToken();
   takeToken(TokenType::Assign);
   builder.CreateStore(expression(), assignee);
@@ -453,9 +465,10 @@ llvm::Value *Frontend::factorIdent() {
   takeToken(TokenType::Ident);
 
   switch (val.type) {
-  case qlangllvm::IdType::QInt:
-    // TODO: something
-    return val.val;
+  case qlangllvm::IdType::Qint:
+    // TODO: something quantum process, now just a loaddata from registor.
+    // return val.val;
+    return builder.CreateLoad(val.val);
   case qlangllvm::IdType::Const:
     return val.val;
   case qlangllvm::IdType::Var:

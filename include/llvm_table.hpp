@@ -13,7 +13,7 @@ enum class IdType {
   Var,
   Param,
   Function,
-  QInt,
+  Qint,
 };
 
 class IdInfo {
@@ -49,6 +49,10 @@ public:
 
   void appendVar(const std::string &name, llvm::Value *val) {
     infos.emplace_back(name, IdType::Var, nullptr, val, cur_level);
+  }
+
+  void appendQint(const std::string &name, llvm::Value *val) {
+    infos.emplace_back(name, IdType::Qint, nullptr, val, cur_level);
   }
 
   void appendParam(const std::string &name) {

@@ -1,13 +1,9 @@
 func main() {
-  var x, y;
-  qint z;
+  qint x, y;
 
-  x = 10;
-  y = 20;
-  z = 0;
+  x = 0;
+  y = 1;
+  x = y;
 
-  if x == 10 then
-    write x;
-
-  writeln;
+  write x;
 }

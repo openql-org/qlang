@@ -41,6 +41,7 @@ public:
   const IdInfo &find(const std::string &id) const;
   const IdInfo &get(size_t id) const { return infos[id]; }
   void appendVar(const std::string &id);
+  void appendQint(const std::string &id);
   void appendParam(const std::string &param, long long offset);
   void appendConst(const std::string &id, long long value);
   size_t appendFunc(const std::string &id, long long entry_point,

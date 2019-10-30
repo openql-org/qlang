@@ -25,6 +25,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	$(RM) $(OBJS) $(TARGET) $(DEPENDS)
 
+run:
+	./qlang example/test.q 
+	llvm-link out.ll ./build/write.ll -S -o ./build/linked.ll
+	opt -S -mem2reg ./build/linked.ll > out.ll
+	lli out.ll
+
 -include $(DEPENDS)
 
 .PHONY: all clean
