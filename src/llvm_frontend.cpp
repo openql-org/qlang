@@ -2,6 +2,7 @@
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/IRPrintingPasses.h>
 #include <llvm/IR/ValueSymbolTable.h>
+#include <llvm/IR/InlineAsm.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/raw_ostream.h>
 #include <string>
@@ -468,6 +469,7 @@ llvm::Value *Frontend::factorIdent() {
   case qlangllvm::IdType::Qint:
     // TODO: something quantum process, now just a loaddata from registor.
     // return val.val;
+    // use llvm::InlineAsm::get
     return builder.CreateLoad(val.val);
   case qlangllvm::IdType::Const:
     return val.val;
@@ -507,6 +509,7 @@ int main(int argc, char **argv) {
   llvm::legacy::PassManager pm;
 
   // generate bitcode
+  // TODO: divide main source code and quantum code.
   std::error_code error_info;
   llvm::raw_fd_ostream raw_stream("out.ll", error_info,
                                   llvm::sys::fs::OpenFlags::F_None);
