@@ -266,18 +266,18 @@ void Frontend::statement() {
     statementAssign();
     return;
   case TokenType::CurlyBracesL:
-    nextToken();
+    nextToken();    
     while (true) {
       statement();
+
       if (cur_token.type == TokenType::Semicolon) {
         takeToken(TokenType::Semicolon);
-        // continue;
+        continue;
       } else if (cur_token.type == TokenType::CurlyBracesR) {
         takeToken(TokenType::CurlyBracesR);
         break;
       } else {
-        lexer.print_head();
-        parseError(TokenType::CurlyBracesR, cur_token.type);
+        continue;
       }
     }
     return;
@@ -323,10 +323,7 @@ void Frontend::statementAssign() {
 
 void Frontend::statementIf() {
   takeToken(TokenType::If);
-
   auto *cond = condition();
-
-  takeToken(TokenType::Then);
 
   auto *then_block = llvm::BasicBlock::Create(context, "if.then", curFunc);
   auto *merge_block = llvm::BasicBlock::Create(context, "if.merge");
@@ -354,7 +351,6 @@ void Frontend::statementWhile() {
   {
     builder.SetInsertPoint(cond_block);
     auto *cond = condition();
-    takeToken(TokenType::Do);
     builder.CreateCondBr(cond, body_block, merge_block);
   }
 

@@ -161,7 +161,6 @@ void Lexer::init_keywords() {
   keywords["var"] = TokenType::Var;
   keywords["func"] = TokenType::Function;
   keywords["if"] = TokenType::If;
-  keywords["then"] = TokenType::Then;
   keywords["while"] = TokenType::While;
   keywords["do"] = TokenType::Do;
   keywords["main"] = TokenType::Main;

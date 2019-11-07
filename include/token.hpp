@@ -12,7 +12,6 @@ enum class TokenType {
   Var,
   Function,
   If,
-  Then,
   While,
   Do,
   Main,
@@ -76,8 +75,6 @@ static std::ostream &operator<<(std::ostream &out, const TokenType type) {
     return out << "Function";
   case TokenType::If:
     return out << "If";
-  case TokenType::Then:
-    return out << "Then";
   case TokenType::While:
     return out << "While";
   case TokenType::Do:
