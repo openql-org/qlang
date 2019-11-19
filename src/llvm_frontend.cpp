@@ -257,6 +257,7 @@ void Frontend::statement() {
 
   // TODO: for just a test qints registors.
   for (const auto &qint : qints) {
+    // TODO: add registore data to quantum_ident_table
     auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, qint);
     ident_table.appendQint(qint, alloca);
   }

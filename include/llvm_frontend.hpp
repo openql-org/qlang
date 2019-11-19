@@ -63,5 +63,6 @@ private:
   Token cur_token;
   Token peek_token;
   qlangllvm::Table ident_table;
+  qlangllvm::Table quantum_ident_table;
 };
 } // namespace qlang

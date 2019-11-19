@@ -55,6 +55,10 @@ public:
     infos.emplace_back(name, IdType::Qint, nullptr, val, cur_level);
   }
 
+  void appendQint(const std::string &name) {
+    infos.emplace_back(name, IdType::Qint, nullptr, nullptr, cur_level);
+  }
+
   void appendParam(const std::string &name) {
     infos.emplace_back(name, IdType::Param, nullptr, nullptr, cur_level);
   }
