@@ -27,10 +27,12 @@ clean:
 
 run:
 	./qlang example/test.q 
+	# optimize frontend IR with opt 
+	opt -O3 -S -f out.ll -o out_o.ll
 	llvm-link out.ll ./build/write.ll -S -o ./build/linked.ll
-	opt -S -mem2reg ./build/linked.ll > out.ll
-	lli out.ll
+	opt -S -mem2reg ./build/linked.ll > exe.ll
+	lli exe.ll
 
 -include $(DEPENDS)
 
-.PHONY: all clean
+.PHONY: all cleanls

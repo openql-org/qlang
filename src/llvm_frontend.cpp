@@ -494,25 +494,3 @@ llvm::Value *Frontend::factorIdent() {
   }
 }
 
-int main(int argc, char **argv) {
-  if (argc != 2) {
-    std::cerr << "usage " << argv[0] << " FILE" << std::endl;
-    return 1;
-  }
-
-  qlang::Frontend frontend(argv[1]);
-  frontend.compile();
-
-  llvm::legacy::PassManager pm;
-
-  // generate bitcode
-  // TODO: divide main source code and quantum code.
-  std::error_code error_info;
-  llvm::raw_fd_ostream raw_stream("out.ll", error_info,
-                                  llvm::sys::fs::OpenFlags::F_None);
-  pm.add(llvm::createPrintModulePass(raw_stream));
-  pm.run(*frontend.getModule());
-  raw_stream.close();
-
-  return 0;
-}
