@@ -1,5 +1,5 @@
 CC      = g++
-CFLAGS  = -g -O0 -MMD -MP `llvm-config --cxxflags`
+CFLAGS  = -g -O0 -MMD -MP `llvm-config --cxxflags` -fexceptions
 LDFLAGS = `llvm-config --ldflags --libs --system-libs`
 LIBS    = 
 INCLUDE = -I ./include
@@ -31,6 +31,9 @@ run:
 	opt -O3 -S -f out.ll -o out_o.ll
 	llvm-link out.ll ./build/write.ll -S -o ./build/linked.ll
 	opt -S -mem2reg ./build/linked.ll > exe.ll
+	# on risc-v target 
+	# llc -march=riscv64 -relocation-model=pic -filetype=asm exe.ll -o exe.s
+	# riscv64-unknown-elf-gcc exe.s -o exe -march=rv64imafdkc
 	lli exe.ll
 
 -include $(DEPENDS)
