@@ -166,33 +166,31 @@ int main(int argc, char **argv) {
   llvm::legacy::PassManager pm;
 
   // optimize legacy code
-  if (optimize > 0) {
-    llvm::Triple ModuleTriple(frontend.getModule()->getTargetTriple());
-    std::string CPUStr, FeaturesStr;
-    TargetMachine *Machine = nullptr;
-    const TargetOptions Options = InitTargetOptionsFromCodeGenFlags();
+  llvm::Triple ModuleTriple(frontend.getModule()->getTargetTriple());
+  std::string CPUStr, FeaturesStr;
+  TargetMachine *Machine = nullptr;
+  const TargetOptions Options = InitTargetOptionsFromCodeGenFlags();
 
-    if (ModuleTriple.getArch()) {
-      CPUStr = getCPUStr();
-      FeaturesStr = getFeaturesStr();
-      Machine = GetTargetMachine(ModuleTriple, CPUStr, FeaturesStr, Options);
-    }
-    std::unique_ptr<TargetMachine> TM(Machine);
-    setFunctionAttributes(CPUStr, FeaturesStr,*frontend.getModule());
-    llvm::TargetLibraryInfoImpl TLII(ModuleTriple);
-
-    pm.add(createTargetTransformInfoWrapperPass(TM ? TM->getTargetIRAnalysis() : TargetIRAnalysis()));
-    std::unique_ptr<legacy::FunctionPassManager> FPasses;
-    FPasses.reset(new legacy::FunctionPassManager(frontend.getModule()));
-    FPasses->add(createTargetTransformInfoWrapperPass(TM ? TM->getTargetIRAnalysis() : TargetIRAnalysis()));
-
-    llvm::PassManagerBuilder Builder;
-    Builder.OptLevel = optimize;
-    Builder.SizeLevel = 0;
-    Builder.Inliner = llvm::createFunctionInliningPass(Builder.OptLevel, Builder.SizeLevel, false);
-    Builder.populateFunctionPassManager(*FPasses);
-    Builder.populateModulePassManager(pm);
+  if (ModuleTriple.getArch()) {
+    CPUStr = getCPUStr();
+    FeaturesStr = getFeaturesStr();
+    Machine = GetTargetMachine(ModuleTriple, CPUStr, FeaturesStr, Options);
   }
+  std::unique_ptr<TargetMachine> TM(Machine);
+  setFunctionAttributes(CPUStr, FeaturesStr,*frontend.getModule());
+  llvm::TargetLibraryInfoImpl TLII(ModuleTriple);
+
+  pm.add(createTargetTransformInfoWrapperPass(TM ? TM->getTargetIRAnalysis() : TargetIRAnalysis()));
+  std::unique_ptr<legacy::FunctionPassManager> FPasses;
+  FPasses.reset(new legacy::FunctionPassManager(frontend.getModule()));
+  FPasses->add(createTargetTransformInfoWrapperPass(TM ? TM->getTargetIRAnalysis() : TargetIRAnalysis()));
+
+  llvm::PassManagerBuilder Builder;
+  Builder.OptLevel = optimize;
+  Builder.SizeLevel = 0;
+  Builder.Inliner = llvm::createFunctionInliningPass(Builder.OptLevel, Builder.SizeLevel, false);
+  Builder.populateFunctionPassManager(*FPasses);
+  Builder.populateModulePassManager(pm);
 
   // generate bitcode
   std::error_code error_info;
