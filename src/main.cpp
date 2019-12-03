@@ -41,29 +41,12 @@
 using namespace qlang;
 
 
-static cl::opt<bool>
-OptLevelO0("O0",
-  cl::desc("Optimization level 0. Similar to clang -O0"));
-
-static cl::opt<bool>
-OptLevelO1("O1",
-           cl::desc("Optimization level 1. Similar to clang -O1"));
-
-static cl::opt<bool>
-OptLevelO2("O2",
-           cl::desc("Optimization level 2. Similar to clang -O2"));
-
-static cl::opt<bool>
-OptLevelO3("O3",
-           cl::desc("Optimization level 3. Similar to clang -O3"));
-
-static cl::opt<unsigned>
-CodeGenOptLevel("codegen-opt-level",
-                cl::desc("Override optimization level for codegen hooks"));
+static cl::opt<bool> OptLevelO0("O0", cl::desc("Optimization level 0. Similar to clang -O0"));
+static cl::opt<bool> OptLevelO1("O1", cl::desc("Optimization level 1. Similar to clang -O1"));
+static cl::opt<bool> OptLevelO2("O2", cl::desc("Optimization level 2. Similar to clang -O2"));
+static cl::opt<bool> OptLevelO3("O3", cl::desc("Optimization level 3. Similar to clang -O3"));
 
 static CodeGenOpt::Level GetCodeGenOptLevel() {
-  if (CodeGenOptLevel.getNumOccurrences())
-    return static_cast<llvm::CodeGenOpt::Level>(unsigned(CodeGenOptLevel));
   if (OptLevelO1)
     return llvm::CodeGenOpt::Less;
   if (OptLevelO2)
@@ -72,15 +55,11 @@ static CodeGenOpt::Level GetCodeGenOptLevel() {
     return llvm::CodeGenOpt::Aggressive;
   return llvm::CodeGenOpt::None;
 }
-
-// Returns the TargetMachine instance or zero if no triple is provided.
 static TargetMachine* GetTargetMachine(Triple TheTriple, StringRef CPUStr,
                                        StringRef FeaturesStr,
                                        const TargetOptions &Options) {
   std::string Error;
-  const Target *TheTarget = TargetRegistry::lookupTarget(MArch, TheTriple,
-                                                         Error);
-  // Some modules don't specify a triple, and this is okay.
+  const Target *TheTarget = TargetRegistry::lookupTarget(MArch, TheTriple, Error);
   if (!TheTarget) {
     return nullptr;
   }
