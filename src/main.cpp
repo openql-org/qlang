@@ -37,6 +37,7 @@
 
 #include "llvm_frontend.hpp"
 #include "option_parser.h"
+#include "quantumOptimizerPass.h"
 
 using namespace qlang;
 
@@ -103,48 +104,20 @@ int main(int argc, char **argv) {
   llvm::InitializeAllAsmPrinters();
   llvm::InitializeAllAsmParsers();
 
-  llvm::PassRegistry &Registry = *llvm::PassRegistry::getPassRegistry();
-  llvm::initializeCore(Registry);
-  llvm::initializeCoroutines(Registry);
-  llvm::initializeScalarOpts(Registry);
-  llvm::initializeObjCARCOpts(Registry);
-  llvm::initializeVectorization(Registry);
-  llvm::initializeIPO(Registry);
-  llvm::initializeAnalysis(Registry);
-  llvm::initializeTransformUtils(Registry);
-  llvm::initializeInstCombine(Registry);
-  llvm::initializeAggressiveInstCombine(Registry);
-  llvm::initializeInstrumentation(Registry);
-  llvm::initializeTarget(Registry);
-  llvm::initializeExpandMemCmpPassPass(Registry);
-  llvm::initializeScalarizeMaskedMemIntrinPass(Registry);
-  llvm::initializeCodeGenPreparePass(Registry);
-  llvm::initializeAtomicExpandPass(Registry);
-  llvm::initializeRewriteSymbolsLegacyPassPass(Registry);
-  llvm::initializeWinEHPreparePass(Registry);
-  llvm::initializeDwarfEHPreparePass(Registry);
-  llvm::initializeSafeStackLegacyPassPass(Registry);
-  llvm::initializeSjLjEHPreparePass(Registry);
-  llvm::initializeStackProtectorPass(Registry);
-  llvm::initializePreISelIntrinsicLoweringLegacyPassPass(Registry);
-  llvm::initializeGlobalMergePass(Registry);
-  llvm::initializeIndirectBrExpandPassPass(Registry);
-  llvm::initializeInterleavedLoadCombinePass(Registry);
-  llvm::initializeInterleavedAccessPass(Registry);
-  llvm::initializeEntryExitInstrumenterPass(Registry);
-  llvm::initializePostInlineEntryExitInstrumenterPass(Registry);
-  llvm::initializeUnreachableBlockElimLegacyPassPass(Registry);
-  llvm::initializeExpandReductionsPass(Registry);
-  llvm::initializeWasmEHPreparePass(Registry);
-  llvm::initializeWriteBitcodePassPass(Registry);
-  llvm::initializeHardwareLoopsPass(Registry);
-
   // compile source code.
   qlang::Frontend frontend(htif_args[0]);
   frontend.compile();
   llvm::legacy::PassManager pm;
 
   // optimize legacy code
+  llvm::PassRegistry &Registry = *llvm::PassRegistry::getPassRegistry();
+  llvm::initializeCore(Registry);
+  llvm::initializeCoroutines(Registry);
+  llvm::initializeIPO(Registry);
+  llvm::initializeAnalysis(Registry);
+  llvm::initializeTransformUtils(Registry);
+  llvm::initializeInstCombine(Registry);
+
   llvm::Triple ModuleTriple(frontend.getModule()->getTargetTriple());
   std::string CPUStr, FeaturesStr;
   TargetMachine *Machine = nullptr;
@@ -155,11 +128,11 @@ int main(int argc, char **argv) {
     FeaturesStr = getFeaturesStr();
     Machine = GetTargetMachine(ModuleTriple, CPUStr, FeaturesStr, Options);
   }
+
   std::unique_ptr<TargetMachine> TM(Machine);
   setFunctionAttributes(CPUStr, FeaturesStr,*frontend.getModule());
-  llvm::TargetLibraryInfoImpl TLII(ModuleTriple);
-
   pm.add(createTargetTransformInfoWrapperPass(TM ? TM->getTargetIRAnalysis() : TargetIRAnalysis()));
+
   std::unique_ptr<legacy::FunctionPassManager> FPasses;
   FPasses.reset(new legacy::FunctionPassManager(frontend.getModule()));
   FPasses->add(createTargetTransformInfoWrapperPass(TM ? TM->getTargetIRAnalysis() : TargetIRAnalysis()));
@@ -170,6 +143,7 @@ int main(int argc, char **argv) {
   Builder.Inliner = llvm::createFunctionInliningPass(Builder.OptLevel, Builder.SizeLevel, false);
   Builder.populateFunctionPassManager(*FPasses);
   Builder.populateModulePassManager(pm);
+  registerquantumOptimizerPass(Builder, pm);
 
   // generate bitcode
   std::error_code error_info;
