@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
   Builder.Inliner = llvm::createFunctionInliningPass(Builder.OptLevel, Builder.SizeLevel, false);
   Builder.populateFunctionPassManager(*FPasses);
   Builder.populateModulePassManager(pm);
-  registerquantumOptimizerPass(Builder, pm);
+  // registerquantumOptimizerPass(Builder, pm);
 
   // generate bitcode
   std::error_code error_info;
