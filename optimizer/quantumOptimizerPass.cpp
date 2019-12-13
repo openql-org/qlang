@@ -1,4 +1,3 @@
-#if 0
 #include "llvm/Pass.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/raw_ostream.h"
@@ -32,4 +31,3 @@ static void registerquantumOptimizerPass(const PassManagerBuilder &,
 static RegisterStandardPasses
   RegisterMyPass(PassManagerBuilder::EP_EarlyAsPossible,
                  registerquantumOptimizerPass);
-#endif
