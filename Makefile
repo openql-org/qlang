@@ -44,13 +44,10 @@ run-riscv:
 	llc -march=riscv64 -relocation-model=pic -filetype=asm exe.ll -o exe.s
 	riscv64-unknown-elf-gcc exe.s -o exe -march=rv64imafdkc
 
-# llvm clang quantum optimizer for c/cpp language pass.
-# clang -S -Xclang -load -Xclang libqot.so test/test_q.c
 qopt:
+# llvm clang quantum optimizer for c/cpp language pass example.
+# exp) clang -S -Xclang -load -Xclang libqot.so test/test_q.c
 	g++ -shared -fPIC -o libqot.so $(OPTIMZ)/quantumOptimizerPass.cpp `llvm-config --cxxflags`
-
-
-
 
 -include $(DEPENDS)
 
