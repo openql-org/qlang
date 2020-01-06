@@ -35,6 +35,7 @@ public:
   llvm::Value *term();
   llvm::Value *factor();
   llvm::Value *factorIdent();
+  llvm::Value *telepcall();
 
 private:
   void nextToken() {

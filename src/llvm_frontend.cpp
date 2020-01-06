@@ -5,18 +5,29 @@
 #include <llvm/IR/InlineAsm.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm-c/Core.h>
 #include <string>
 
 #include "llvm_frontend.hpp"
 
 using namespace qlang;
 
+
+llvm::Value *Frontend::telepcall() {
+  LLVMTypeRef elem_types[1];
+  auto * ipc_type = LLVMFunctionType(LLVMVoidType(), elem_types, 1, 0);
+  char buff[128];
+  sprintf(buff, "qtelep.k  %s, %s, qzero, 0", "qa0", "qt1");
+  auto * fn = LLVMConstInlineAsm(ipc_type, buff, "", 0, 0);
+  // LLVMBuildCall(builder, fn, NULL, 0, "");
+}
+
+
 Frontend::Frontend(const std::string &path)
     : lexer(path), context(), module(new llvm::Module("top", context)),
       builder(context) {
   cur_token = std::move(lexer.nextToken());
   peek_token = std::move(lexer.nextToken());
-
   {
     std::vector<llvm::Type *> param_types(1, builder.getInt64Ty());
     auto *funcType =
@@ -158,7 +169,7 @@ void Frontend::functionDecl() {
     auto *funcType = llvm::FunctionType::get(builder.getInt64Ty(), false);
     auto *mainFunc = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", module);
     auto *entry = llvm::BasicBlock::Create(context, "entrypoint", mainFunc);
-
+    
     nextToken();
 
     std::vector<std::string> params;
@@ -409,7 +420,7 @@ llvm::Value *Frontend::expression() {
   if (sign == TokenType::Minus) {
     ret = builder.CreateNeg(ret);
   }
-
+  
   while (true) {
     if (cur_token.type == TokenType::Plus) {
       nextToken();
