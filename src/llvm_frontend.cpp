@@ -13,13 +13,23 @@
 using namespace qlang;
 
 
-llvm::Value *Frontend::telepcall() {
-  LLVMTypeRef elem_types[1];
-  auto * ipc_type = LLVMFunctionType(LLVMVoidType(), elem_types, 1, 0);
+// TODO: just a test code.
+void *Frontend::telepcall() {
+
+  std::vector<llvm::Value*> Args;
+  llvm::Type *ResultType;
+  ResultType = llvm::Type::getVoidTy(context);
+  llvm::FunctionType *fTy = llvm::FunctionType::get(ResultType, false);
+
   char buff[128];
   sprintf(buff, "qtelep.k  %s, %s, qzero, 0", "qa0", "qt1");
-  auto * fn = LLVMConstInlineAsm(ipc_type, buff, "", 0, 0);
-  // LLVMBuildCall(builder, fn, NULL, 0, "");
+
+  bool hasSideEffect = true;
+  llvm::InlineAsm::AsmDialect asmDialect = llvm::InlineAsm::AD_ATT;
+  std::string constraints = "";
+  llvm::InlineAsm *iaExpr = llvm::InlineAsm::get(fTy, buff, constraints, hasSideEffect, false, asmDialect);
+  llvm::CallInst *Results = builder.CreateCall(iaExpr);
+  Results->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);
 }
 
 
@@ -45,6 +55,10 @@ Frontend::Frontend(const std::string &path)
 
 void Frontend::compile() {
   block(nullptr);
+
+  // TODO: test code.
+  telepcall();
+  
   builder.CreateRet(builder.getInt64(0));
 }
 
