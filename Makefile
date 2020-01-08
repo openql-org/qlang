@@ -27,17 +27,16 @@ clean:
 	$(RM) $(OBJS) $(TARGET) $(DEPENDS)
 
 run:
-	./qlang example/test.q 
+# exp) spike -r2 -q2 pk ./exe
 	# optimize frontend IR with opt ls
-	opt -O3 -S -f out.ll -o out_o.ll
+	./qlang -O3 example/test.q 
 	llvm-link out.ll ./build/write.ll -S -o ./build/linked.ll
 	opt -S -mem2reg ./build/linked.ll > exe.ll
 	lli exe.ll
 
 run-riscv:
-	./qlang example/test.q 
 	# optimize frontend IR with opt ls
-	opt -O3 -S -f out.ll -o out_o.ll
+	./qlang -O3 example/test.q 
 	llvm-link out.ll ./build/write.ll -S -o ./build/linked.ll
 	opt -S -mem2reg ./build/linked.ll > exe.ll
 	# on risc-v target 

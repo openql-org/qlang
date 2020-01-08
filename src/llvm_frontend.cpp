@@ -16,7 +16,6 @@ using namespace qlang;
 // TODO: just a test code.
 void *Frontend::telepcall() {
 
-  std::vector<llvm::Value*> Args;
   llvm::Type *ResultType;
   ResultType = llvm::Type::getVoidTy(context);
   llvm::FunctionType *fTy = llvm::FunctionType::get(ResultType, false);
@@ -31,7 +30,6 @@ void *Frontend::telepcall() {
   llvm::CallInst *Results = builder.CreateCall(iaExpr);
   Results->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);
 }
-
 
 Frontend::Frontend(const std::string &path)
     : lexer(path), context(), module(new llvm::Module("top", context)),

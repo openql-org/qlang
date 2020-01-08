@@ -54,6 +54,7 @@ static CodeGenOpt::Level GetCodeGenOptLevel() {
     return llvm::CodeGenOpt::Aggressive;
   return llvm::CodeGenOpt::None;
 }
+
 static TargetMachine* GetTargetMachine(Triple TheTriple, StringRef CPUStr,
                                        StringRef FeaturesStr,
                                        const TargetOptions &Options) {
