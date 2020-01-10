@@ -18,7 +18,7 @@ void *Frontend::telepcall() {
 
   llvm::Type *ResultType;
   ResultType = llvm::Type::getVoidTy(context);
-  llvm::FunctionType *fTy = llvm::FunctionType::get(ResultType, false);
+  llvm::FunctionType *funcType = llvm::FunctionType::get(ResultType, false);
 
   char buff[128];
   sprintf(buff, "qtelep.k  %s, %s, qzero, 0", "qa0", "qt1");
@@ -26,9 +26,9 @@ void *Frontend::telepcall() {
   bool hasSideEffect = true;
   llvm::InlineAsm::AsmDialect asmDialect = llvm::InlineAsm::AD_ATT;
   std::string constraints = "";
-  llvm::InlineAsm *iaExpr = llvm::InlineAsm::get(fTy, buff, constraints, hasSideEffect, false, asmDialect);
-  llvm::CallInst *Results = builder.CreateCall(iaExpr);
-  Results->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);
+  llvm::InlineAsm *ia = llvm::InlineAsm::get(funcType, buff, constraints, hasSideEffect, false, asmDialect);
+  llvm::CallInst *result = builder.CreateCall(ia);
+  result->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);
 }
 
 Frontend::Frontend(const std::string &path)
