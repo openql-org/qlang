@@ -29,8 +29,6 @@ enum class Instruction {
   Writeln,
 };
 
-using Program = std::vector<long long>;
-
 static std::ostream &operator<<(std::ostream &out, const Instruction inst) {
   switch (inst) {
   case Instruction::Load:
@@ -115,5 +113,4 @@ static size_t operand_size(Instruction inst) {
   }
 }
 
-void print_program(const Program &program);
 } // namespace qlang
