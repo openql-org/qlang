@@ -8,6 +8,7 @@
 #include "lexer.hpp"
 #include "llvm_table.hpp"
 #include "token.hpp"
+#include "quantum_register.hpp"
 
 namespace qlang {
 class Frontend {
