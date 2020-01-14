@@ -7,6 +7,7 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm-c/Core.h>
 #include <string>
+#include <sstream>
 
 #include "llvm_frontend.hpp"
 
@@ -14,19 +15,19 @@ using namespace qlang;
 
 
 // TODO: just a test code.
-void *Frontend::telepcall() {
+void *Frontend::telepcall(QuantumRegister q1, QuantumRegister q2) {
 
   llvm::Type *ResultType;
   ResultType = llvm::Type::getVoidTy(context);
   llvm::FunctionType *funcType = llvm::FunctionType::get(ResultType, false);
 
-  char buff[128];
-  sprintf(buff, "qtelep.k  %s, %s, qzero, 0", "qa0", "qt1");
+  std::stringstream ss;
+  ss << "qtelep.k  " << q1 << ", " << q2 << ", qzero, 0";
 
   bool hasSideEffect = true;
   llvm::InlineAsm::AsmDialect asmDialect = llvm::InlineAsm::AD_ATT;
   std::string constraints = "";
-  llvm::InlineAsm *ia = llvm::InlineAsm::get(funcType, buff, constraints, hasSideEffect, false, asmDialect);
+  llvm::InlineAsm *ia = llvm::InlineAsm::get(funcType, ss.str(), constraints, hasSideEffect, false, asmDialect);
   llvm::CallInst *result = builder.CreateCall(ia);
   result->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);
 }
@@ -55,7 +56,7 @@ void Frontend::compile() {
   block(nullptr);
 
   // TODO: test code.
-  telepcall();
+  telepcall(QuantumRegister::q1, QuantumRegister::q0);
   
   builder.CreateRet(builder.getInt64(0));
 }
@@ -330,17 +331,30 @@ void Frontend::statement() {
 
 void Frontend::statementAssign() {
   const auto &info = ident_table.find(cur_token.ident);
+std::cout << "statementAssign1 : " << cur_token << std::endl;
   llvm::Value *assignee;
   if (info.type == IdType::Var) {
     assignee = info.val;
   } else if (info.type == IdType::Qint) {
+std::cout << "Qint" << std::endl;
+std::cout << "    " << info.val << std::endl;
     assignee = info.val;
   } else {
     error("variable is expected but it is not variable");
   }
 
   nextToken();
+std::cout << "statementAssign2 : " << cur_token << std::endl;
   takeToken(TokenType::Assign);
+std::cout << "statementAssign3 : " << cur_token << std::endl;
+if (cur_token.type == TokenType::Ident) {
+const auto &infotarget = ident_table.find(cur_token.ident);
+if (infotarget.type == IdType::Var) {
+} else if (infotarget.type == IdType::Qint) {
+std::cout << "Qint" << std::endl;
+}
+}
+
   builder.CreateStore(expression(), assignee);
   return;
 }
@@ -424,6 +438,7 @@ llvm::Value *Frontend::condition() {
 
 llvm::Value *Frontend::expression() {
   TokenType sign = cur_token.type;
+std::cout << "expression : "  << cur_token << std::endl;
   if (cur_token.type == TokenType::Plus || cur_token.type == TokenType::Minus) {
     nextToken();
   }
@@ -483,13 +498,13 @@ llvm::Value *Frontend::factor() {
 
 llvm::Value *Frontend::factorIdent() {
   auto &val = ident_table.find(cur_token.ident);
+std::cout << "factorIdent : " << cur_token << std::endl;
   takeToken(TokenType::Ident);
 
   switch (val.type) {
   case IdType::Qint:
     // TODO: something quantum process, now just a loaddata from registor.
     // return val.val;
-    // use llvm::InlineAsm::get
     return builder.CreateLoad(val.val);
   case IdType::Const:
     return val.val;

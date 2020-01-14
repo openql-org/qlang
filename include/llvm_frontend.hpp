@@ -38,7 +38,7 @@ public:
   llvm::Value *factorIdent();
 
   // TODO: test impl.
-  void *telepcall();
+  void *telepcall(QuantumRegister q1, QuantumRegister q2);
 
 private:
   void nextToken() {
