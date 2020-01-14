@@ -256,7 +256,7 @@ void Frontend::functionDecl() {
 void Frontend::statement() {
   size_t backpatch_target;
   size_t start_at;
-  const qlangllvm::IdInfo *info;
+  const IdInfo *info;
   std::vector<std::string> vars;
   std::vector<std::string> qints;
 
@@ -331,9 +331,9 @@ void Frontend::statement() {
 void Frontend::statementAssign() {
   const auto &info = ident_table.find(cur_token.ident);
   llvm::Value *assignee;
-  if (info.type == qlangllvm::IdType::Var) {
+  if (info.type == IdType::Var) {
     assignee = info.val;
-  } else if (info.type == qlangllvm::IdType::Qint) {
+  } else if (info.type == IdType::Qint) {
     assignee = info.val;
   } else {
     error("variable is expected but it is not variable");
@@ -486,18 +486,18 @@ llvm::Value *Frontend::factorIdent() {
   takeToken(TokenType::Ident);
 
   switch (val.type) {
-  case qlangllvm::IdType::Qint:
+  case IdType::Qint:
     // TODO: something quantum process, now just a loaddata from registor.
     // return val.val;
     // use llvm::InlineAsm::get
     return builder.CreateLoad(val.val);
-  case qlangllvm::IdType::Const:
+  case IdType::Const:
     return val.val;
-  case qlangllvm::IdType::Var:
+  case IdType::Var:
     return builder.CreateLoad(val.val);
-  case qlangllvm::IdType::Param:
+  case IdType::Param:
     error("Param ident can not be factor");
-  case qlangllvm::IdType::Function:
+  case IdType::Function:
     takeToken(TokenType::ParenL);
     std::vector<llvm::Value *> args;
     while (cur_token.type != TokenType::ParenR) {
