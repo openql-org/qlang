@@ -7,7 +7,7 @@
 
 #include "error.hpp"
 
-namespace qlangllvm {
+namespace qlang {
 enum class IdType {
   Const,
   Var,
@@ -81,4 +81,4 @@ private:
   std::vector<IdInfo> infos;
   size_t cur_level;
 };
-} // namespace qlangllvm
+} // namespace qlang

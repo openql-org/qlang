@@ -66,8 +66,8 @@ private:
 
   Token cur_token;
   Token peek_token;
-  qlangllvm::Table ident_table;
-  qlangllvm::Table quantum_ident_table;
+  qlang::Table ident_table;
+  qlang::Table quantum_ident_table;
   std::map<QuantumRegister, bool> qregmap;
 };
 } // namespace qlang
