@@ -15,14 +15,30 @@ using namespace qlang;
 
 
 // TODO: just a test code.
-void *Frontend::telepcall(QuantumRegister q1, QuantumRegister q2) {
+void Frontend::qooxcall(QuantumRegister q1) {
+  std::stringstream ss;
+  ss << "qoox.k  " << q1 << ",qzero, qzero, 0";
 
   llvm::Type *ResultType;
   ResultType = llvm::Type::getVoidTy(context);
   llvm::FunctionType *funcType = llvm::FunctionType::get(ResultType, false);
 
+  bool hasSideEffect = true;
+  llvm::InlineAsm::AsmDialect asmDialect = llvm::InlineAsm::AD_ATT;
+  std::string constraints = "";
+  llvm::InlineAsm *ia = llvm::InlineAsm::get(funcType, ss.str(), constraints, hasSideEffect, false, asmDialect);
+  llvm::CallInst *result = builder.CreateCall(ia);
+  result->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);
+}
+
+void Frontend::telepcall(QuantumRegister q1, QuantumRegister q2) {
+
   std::stringstream ss;
   ss << "qtelep.k  " << q1 << ", " << q2 << ", qzero, 0";
+
+  llvm::Type *ResultType;
+  ResultType = llvm::Type::getVoidTy(context);
+  llvm::FunctionType *funcType = llvm::FunctionType::get(ResultType, false);
 
   bool hasSideEffect = true;
   llvm::InlineAsm::AsmDialect asmDialect = llvm::InlineAsm::AD_ATT;
