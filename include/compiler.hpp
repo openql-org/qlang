@@ -5,7 +5,6 @@
 
 #include "instruction.hpp"
 #include "lexer.hpp"
-#include "table.hpp"
 #include "token.hpp"
 
 namespace qlang {

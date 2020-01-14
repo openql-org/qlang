@@ -17,6 +17,12 @@ enum class QuantumRegister {
   q24,  q25,  q26,  q27,  q28,  q29,  q30,  q31
 };
 
+enum class QuantumRegisterABI {
+  qzero, qt1, qt2,  qt3,  qt4, qt5, qt6,  qt7,
+  qs0, qs1, qa0,  qa1,  qa2, qa3, qa4,  qa5,
+  qa6, qa7, qs2,  qs3,  qs4, qs5, qs6,  qs7,
+  qs8, qs9, qs10, qs11, qt8, qt9, qt10, qt11
+};
 
 static std::ostream &operator<<(std::ostream &out, const QuantumRegister reg) {
   switch (reg) {
@@ -84,6 +90,75 @@ static std::ostream &operator<<(std::ostream &out, const QuantumRegister reg) {
     return out << "q30";
   case QuantumRegister::q31:
     return out << "q31";
+  }
+}
+
+static std::ostream &operator<<(std::ostream &out, const QuantumRegisterABI reg) {
+  switch (reg) {
+  case QuantumRegisterABI::qzero:
+    return out << "qzero";
+  case QuantumRegisterABI::qt1:
+    return out << "qt1";
+  case QuantumRegisterABI::qt2:
+    return out << "qt2";
+  case QuantumRegisterABI::qt3:
+    return out << "qt3";
+  case QuantumRegisterABI::qt4:
+    return out << "qt4";
+  case QuantumRegisterABI::qt5:
+    return out << "qt";
+  case QuantumRegisterABI::qt6:
+    return out << "qt6";
+  case QuantumRegisterABI::qt7:
+    return out << "qt7";
+  case QuantumRegisterABI::qs0:
+    return out << "qs0";
+  case QuantumRegisterABI::qs1:
+    return out << "qs1";
+  case QuantumRegisterABI::qa0:
+    return out << "qa0";
+  case QuantumRegisterABI::qa1:
+    return out << "qa1";
+  case QuantumRegisterABI::qa2:
+    return out << "qa2";
+  case QuantumRegisterABI::qa3:
+    return out << "qa3";
+  case QuantumRegisterABI::qa4:
+    return out << "qa4";
+  case QuantumRegisterABI::qa5:
+    return out << "qa5";
+  case QuantumRegisterABI::qa6:
+    return out << "qa6";
+  case QuantumRegisterABI::qa7:
+    return out << "qs7";
+  case QuantumRegisterABI::qs2:
+    return out << "qs2";
+  case QuantumRegisterABI::qs3:
+    return out << "qs3";
+  case QuantumRegisterABI::qs4:
+    return out << "qs4";
+  case QuantumRegisterABI::qs5:
+    return out << "qs5";
+  case QuantumRegisterABI::qs6:
+    return out << "qs6";
+  case QuantumRegisterABI::qs7:
+    return out << "qs7";
+  case QuantumRegisterABI::qs8:
+    return out << "qs8";
+  case QuantumRegisterABI::qs9:
+    return out << "qs9";
+  case QuantumRegisterABI::qs10:
+    return out << "qs10";
+  case QuantumRegisterABI::qs11:
+    return out << "qs1";
+  case QuantumRegisterABI::qt8:
+    return out << "qt8";
+  case QuantumRegisterABI::qt9:
+    return out << "qt9";
+  case QuantumRegisterABI::qt10:
+    return out << "qt10";
+  case QuantumRegisterABI::qt11:
+    return out << "qt11";
   }
 }
 
