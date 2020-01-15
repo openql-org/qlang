@@ -70,10 +70,6 @@ Frontend::Frontend(const std::string &path)
 
 void Frontend::compile() {
   block(nullptr);
-
-  // TODO: test code.
-  telepcall(QuantumRegister::q1, QuantumRegister::q0);
-  
   builder.CreateRet(builder.getInt64(0));
 }
 
@@ -295,11 +291,16 @@ void Frontend::statement() {
     ident_table.appendVar(var, alloca);
   }
 
-  // TODO: for just a test qints registors.
+  // TODO: alloc for just a qints registors.
   for (const auto &qint : qints) {
-    // TODO: add registore data to quantum_ident_table
-    auto *alloca = builder.CreateAlloca(builder.getInt64Ty(), 0, qint);
-    ident_table.appendQint(qint, alloca);
+    QuantumRegister r;
+    for (r = QuantumRegister::q0; r <= QuantumRegister::q31; ++r) {
+      if (!qregmap[r]) {
+        qregmap[r] = true;
+        break;
+      }
+    }
+    ident_table.appendQint(qint, r);
   }
 
   switch (cur_token.type) {
@@ -364,11 +365,20 @@ std::cout << "statementAssign2 : " << cur_token << std::endl;
 
   takeToken(TokenType::Assign);
 
-std::cout << "statementAssign3 : " << cur_token << std::endl;
-if (cur_token.type == TokenType::Ident) {
-  const auto &infotarget = ident_table.find(cur_token.ident);
-  std::cout << "Id               : " << infotarget << std::endl;
-}
+  std::cout << "statementAssign3 : " << cur_token << std::endl;
+  if (cur_token.type == TokenType::Ident) {
+    const auto &infotarget = ident_table.find(cur_token.ident);
+    std::cout << "Id               : " << infotarget << std::endl;
+    if (info.type == IdType::Qint && infotarget.type == IdType::Qint) {
+      telepcall(infotarget.qreg, info.qreg);
+      nextToken();
+      return;
+    }
+  } else if (info.type == IdType::Qint && cur_token.type == TokenType::Integer) {
+    telepcall(info.qreg, QuantumRegister::q0);
+    nextToken();
+    return;
+  }
 
   builder.CreateStore(expression(), assignee);
   return;
@@ -465,6 +475,7 @@ std::cout << "expression       : "  << cur_token << std::endl;
   
   while (true) {
     if (cur_token.type == TokenType::Plus) {
+std::cout << "                 : "  << cur_token << std::endl;
       nextToken();
       ret = builder.CreateAdd(ret, term());
     } else if (cur_token.type == TokenType::Minus) {
@@ -518,14 +529,11 @@ std::cout << "factorIdent      : " << cur_token << std::endl;
   takeToken(TokenType::Ident);
 
   switch (val.type) {
-  case IdType::Qint:
-    // TODO: something quantum process, now just a loaddata from registor.
-    // return val.val;
-    return builder.CreateLoad(val.val);
   case IdType::Const:
     return val.val;
   case IdType::Var:
     return builder.CreateLoad(val.val);
+  case IdType::Qint:
   case IdType::Param:
     error("Param ident can not be factor");
   case IdType::Function:

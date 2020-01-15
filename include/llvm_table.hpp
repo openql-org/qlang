@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "error.hpp"
+#include "quantum_register.hpp"
 
 namespace qlang {
 enum class IdType {
@@ -19,8 +20,8 @@ enum class IdType {
 class IdInfo {
 public:
   IdInfo(const std::string &name, IdType type, llvm::Function *func,
-         llvm::Value *val, size_t level)
-      : name(name), type(type), func(func), val(val), level(level) {}
+         llvm::Value *val, size_t level, QuantumRegister qreg)
+      : name(name), type(type), func(func), val(val), level(level), qreg(qreg) {}
 
 public:
   std::string name;
@@ -28,6 +29,7 @@ public:
   llvm::Function *func;
   llvm::Value *val;
   size_t level;
+  QuantumRegister qreg;
 };
 
 static std::ostream &operator<<(std::ostream &out, const IdInfo &idinfo) {
@@ -67,27 +69,27 @@ public:
   }
 
   void appendConst(const std::string &name, llvm::Value *val) {
-    infos.emplace_back(name, IdType::Const, nullptr, val, cur_level);
+    infos.emplace_back(name, IdType::Const, nullptr, val, cur_level, QuantumRegister::q0);
   }
 
   void appendVar(const std::string &name, llvm::Value *val) {
-    infos.emplace_back(name, IdType::Var, nullptr, val, cur_level);
+    infos.emplace_back(name, IdType::Var, nullptr, val, cur_level, QuantumRegister::q0);
   }
 
-  void appendQint(const std::string &name, llvm::Value *val) {
-    infos.emplace_back(name, IdType::Qint, nullptr, val, cur_level);
+  void appendQint(const std::string &name, QuantumRegister r) {
+    infos.emplace_back(name, IdType::Qint, nullptr, nullptr, cur_level, r);
   }
 
   void appendQint(const std::string &name) {
-    infos.emplace_back(name, IdType::Qint, nullptr, nullptr, cur_level);
+    infos.emplace_back(name, IdType::Qint, nullptr, nullptr, cur_level, QuantumRegister::q0);
   }
 
   void appendParam(const std::string &name) {
-    infos.emplace_back(name, IdType::Param, nullptr, nullptr, cur_level);
+    infos.emplace_back(name, IdType::Param, nullptr, nullptr, cur_level, QuantumRegister::q0);
   }
 
   void appendFunction(const std::string &name, llvm::Function *func) {
-    infos.emplace_back(name, IdType::Function, func, nullptr, cur_level);
+    infos.emplace_back(name, IdType::Function, func, nullptr, cur_level, QuantumRegister::q0);
   }
 
   void enterBlock() { cur_level++; }
