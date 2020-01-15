@@ -348,27 +348,26 @@ void Frontend::statement() {
 void Frontend::statementAssign() {
   const auto &info = ident_table.find(cur_token.ident);
 std::cout << "statementAssign1 : " << cur_token << std::endl;
+std::cout << "Id               : " << info << std::endl;
   llvm::Value *assignee;
   if (info.type == IdType::Var) {
     assignee = info.val;
   } else if (info.type == IdType::Qint) {
-std::cout << "Qint" << std::endl;
-std::cout << "    " << info.val << std::endl;
     assignee = info.val;
   } else {
     error("variable is expected but it is not variable");
   }
 
   nextToken();
+
 std::cout << "statementAssign2 : " << cur_token << std::endl;
+
   takeToken(TokenType::Assign);
+
 std::cout << "statementAssign3 : " << cur_token << std::endl;
 if (cur_token.type == TokenType::Ident) {
-const auto &infotarget = ident_table.find(cur_token.ident);
-if (infotarget.type == IdType::Var) {
-} else if (infotarget.type == IdType::Qint) {
-std::cout << "Qint" << std::endl;
-}
+  const auto &infotarget = ident_table.find(cur_token.ident);
+  std::cout << "Id               : " << infotarget << std::endl;
 }
 
   builder.CreateStore(expression(), assignee);
@@ -454,7 +453,7 @@ llvm::Value *Frontend::condition() {
 
 llvm::Value *Frontend::expression() {
   TokenType sign = cur_token.type;
-std::cout << "expression : "  << cur_token << std::endl;
+std::cout << "expression       : "  << cur_token << std::endl;
   if (cur_token.type == TokenType::Plus || cur_token.type == TokenType::Minus) {
     nextToken();
   }
@@ -497,6 +496,7 @@ llvm::Value *Frontend::term() {
 llvm::Value *Frontend::factor() {
   llvm::Value *ret;
   if (cur_token.type == TokenType::Ident) {
+    std::cout << "factor()         : " << cur_token << std::endl;
     ret = factorIdent();
   } else if (cur_token.type == TokenType::Integer) {
     ret = builder.getInt64(cur_token.integer);
@@ -514,7 +514,7 @@ llvm::Value *Frontend::factor() {
 
 llvm::Value *Frontend::factorIdent() {
   auto &val = ident_table.find(cur_token.ident);
-std::cout << "factorIdent : " << cur_token << std::endl;
+std::cout << "factorIdent      : " << cur_token << std::endl;
   takeToken(TokenType::Ident);
 
   switch (val.type) {
