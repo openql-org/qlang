@@ -9,7 +9,7 @@
 #include <string>
 #include <sstream>
 
-#include "llvm_frontend.hpp"
+#include "frontend.hpp"
 
 using namespace qlang;
 
@@ -348,8 +348,6 @@ void Frontend::statement() {
 
 void Frontend::statementAssign() {
   const auto &info = ident_table.find(cur_token.ident);
-std::cout << "statementAssign1 : " << cur_token << std::endl;
-std::cout << "Id               : " << info << std::endl;
   llvm::Value *assignee;
   if (info.type == IdType::Var) {
     assignee = info.val;
@@ -360,15 +358,10 @@ std::cout << "Id               : " << info << std::endl;
   }
 
   nextToken();
-
-std::cout << "statementAssign2 : " << cur_token << std::endl;
-
   takeToken(TokenType::Assign);
-
-  std::cout << "statementAssign3 : " << cur_token << std::endl;
   if (cur_token.type == TokenType::Ident) {
     const auto &infotarget = ident_table.find(cur_token.ident);
-    std::cout << "Id               : " << infotarget << std::endl;
+
     if (info.type == IdType::Qint && infotarget.type == IdType::Qint) {
       telepcall(infotarget.qreg, info.qreg);
       nextToken();
@@ -463,7 +456,6 @@ llvm::Value *Frontend::condition() {
 
 llvm::Value *Frontend::expression() {
   TokenType sign = cur_token.type;
-std::cout << "expression       : "  << cur_token << std::endl;
   if (cur_token.type == TokenType::Plus || cur_token.type == TokenType::Minus) {
     nextToken();
   }
@@ -475,7 +467,6 @@ std::cout << "expression       : "  << cur_token << std::endl;
   
   while (true) {
     if (cur_token.type == TokenType::Plus) {
-std::cout << "                 : "  << cur_token << std::endl;
       nextToken();
       ret = builder.CreateAdd(ret, term());
     } else if (cur_token.type == TokenType::Minus) {
@@ -507,7 +498,6 @@ llvm::Value *Frontend::term() {
 llvm::Value *Frontend::factor() {
   llvm::Value *ret;
   if (cur_token.type == TokenType::Ident) {
-    std::cout << "factor()         : " << cur_token << std::endl;
     ret = factorIdent();
   } else if (cur_token.type == TokenType::Integer) {
     ret = builder.getInt64(cur_token.integer);
@@ -525,7 +515,6 @@ llvm::Value *Frontend::factor() {
 
 llvm::Value *Frontend::factorIdent() {
   auto &val = ident_table.find(cur_token.ident);
-std::cout << "factorIdent      : " << cur_token << std::endl;
   takeToken(TokenType::Ident);
 
   switch (val.type) {

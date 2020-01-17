@@ -33,7 +33,7 @@
 #include <llvm/LinkAllPasses.h>
 
 #include <string>
-#include "llvm_frontend.hpp"
+#include "frontend.hpp"
 #include "option_parser.h"
 #include "quantumOptimizerPass.h"
 

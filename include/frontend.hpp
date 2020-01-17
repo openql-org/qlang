@@ -6,7 +6,7 @@
 
 #include "error.hpp"
 #include "lexer.hpp"
-#include "llvm_table.hpp"
+#include "table.hpp"
 #include "token.hpp"
 #include "quantum_register.hpp"
 
