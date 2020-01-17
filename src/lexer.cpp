@@ -122,7 +122,20 @@ void Lexer::print_all() {
 
 void Lexer::skip_blank() {
   // skip ' ', '\t', '\n', '\v', '\f', '\r'
-  while (isspace(peekc())) {
+  while (1) {
+    char n = peekc();
+    if (n == '/' && try_readc('/')) {
+      // comment out
+      n = readc();
+      while (1) {
+        if (n == '\n' || n == '\r') break;
+        n = readc();
+      }
+    }
+
+    if (!isspace(n)) {
+      break;
+    }
     readc();
   }
 }

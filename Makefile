@@ -10,6 +10,7 @@ SOURCES = $(shell ls $(SRC_DIR)/*.cpp)
 OBJS    = $(subst $(SRC_DIR),$(OBJ_DIR), $(SOURCES:.cpp=.o))
 TARGET  = qlang
 DEPENDS = $(OBJS:.o=.d)
+LLFILES = *.ll
 
 all: $(TARGET)
 
@@ -24,7 +25,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $< 
 
 clean:
-	$(RM) $(OBJS) $(TARGET) $(DEPENDS)
+	$(RM) $(OBJS) $(TARGET) $(DEPENDS) $(LLFILES)
 
 run:
 # exp) spike -r2 -q2 pk ./exe
