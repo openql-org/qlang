@@ -32,7 +32,7 @@ llvm::Value* Frontend::qmeascall(QuantumRegister q1) {
 
 void Frontend::qooxcall(QuantumRegister q1) {
   std::stringstream ss;
-  ss << "qoox.k  " << q1 << ",qzero, qzero, 0";
+  ss << "qoox.k  qzero," << q1 << ", qzero, 1";
 
   auto *funcType = llvm::FunctionType::get(llvm::Type::getVoidTy(context), false);
   bool hasSideEffect = true;
@@ -45,7 +45,7 @@ void Frontend::qooxcall(QuantumRegister q1) {
 
 void Frontend::telepcall(QuantumRegister q1, QuantumRegister q2) {
   std::stringstream ss;
-  ss << "qtelep.k  " << q1 << ", " << q2 << ", qzero, 0";
+  ss << "qtelep.k  qzero, " << q1 << ", " << q2 << ", 1";
 
   auto *funcType = llvm::FunctionType::get(llvm::Type::getVoidTy(context), false);
   bool hasSideEffect = true;
@@ -301,7 +301,7 @@ void Frontend::statement() {
   // TODO: alloc for just a qints registors.
   for (const auto &qint : qints) {
     QuantumRegister r;
-    for (r = QuantumRegister::q0; r <= QuantumRegister::q31; ++r) {
+    for (r = QuantumRegister::q1; r <= QuantumRegister::q31; ++r) {
       if (!qregmap[r]) {
         qregmap[r] = true;
         break;
