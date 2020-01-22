@@ -277,7 +277,6 @@ void Frontend::functionDecl() {
 void Frontend::statement() {
   size_t backpatch_target;
   size_t start_at;
-  const IdInfo *info;
   std::vector<std::string> vars;
   std::vector<std::string> qints;
 
@@ -507,6 +506,8 @@ llvm::Value *Frontend::factor() {
   llvm::Value *ret;
   if (cur_token.type == TokenType::Ident) {
     ret = factorIdent();
+  } else if (cur_token.type == TokenType::Qint) {
+    ret = factorIdent();
   } else if (cur_token.type == TokenType::Integer) {
     ret = builder.getInt64(cur_token.integer);
     nextToken();
@@ -531,6 +532,7 @@ llvm::Value *Frontend::factorIdent() {
   case IdType::Var:
     return builder.CreateLoad(val.val);
   case IdType::Qint:
+    return qmeascall(val.qreg);
   case IdType::Param:
     error("Param ident can not be factor");
   case IdType::Function:
