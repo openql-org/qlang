@@ -39,6 +39,7 @@ public:
 
   void telepcall(QuantumRegister q1, QuantumRegister q2);
   void qooxcall(QuantumRegister q1);
+  llvm::Value* qmeascall(QuantumRegister q1);
 
 private:
   void nextToken() {
