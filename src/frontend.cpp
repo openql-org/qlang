@@ -19,9 +19,7 @@ llvm::Value* Frontend::qmeascall(QuantumRegister q1) {
   std::stringstream ss;
   ss << "qmeas.k  " << q1 << ",qzero, qzero, 0";
 
-  auto *ResultType = llvm::Type::getInt32Ty(context);
-  auto *funcType = llvm::FunctionType::get(ResultType, false);
-
+  auto *funcType = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
   bool hasSideEffect = true;
   auto asmDialect = llvm::InlineAsm::AD_ATT;
   std::string constraints = "";
@@ -36,9 +34,7 @@ void Frontend::qooxcall(QuantumRegister q1) {
   std::stringstream ss;
   ss << "qoox.k  " << q1 << ",qzero, qzero, 0";
 
-  auto *ResultType = llvm::Type::getVoidTy(context);
-  auto *funcType = llvm::FunctionType::get(ResultType, false);
-
+  auto *funcType = llvm::FunctionType::get(llvm::Type::getVoidTy(context), false);
   bool hasSideEffect = true;
   auto asmDialect = llvm::InlineAsm::AD_ATT;
   std::string constraints = "";
@@ -48,13 +44,10 @@ void Frontend::qooxcall(QuantumRegister q1) {
 }
 
 void Frontend::telepcall(QuantumRegister q1, QuantumRegister q2) {
-
   std::stringstream ss;
   ss << "qtelep.k  " << q1 << ", " << q2 << ", qzero, 0";
 
-  auto *ResultType = llvm::Type::getVoidTy(context);
-  auto *funcType = llvm::FunctionType::get(ResultType, false);
-
+  auto *funcType = llvm::FunctionType::get(llvm::Type::getVoidTy(context), false);
   bool hasSideEffect = true;
   auto asmDialect = llvm::InlineAsm::AD_ATT;
   std::string constraints = "";
