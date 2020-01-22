@@ -17,12 +17,12 @@ using namespace qlang;
 // TODO: just a test code.
 llvm::Value* Frontend::qmeascall(QuantumRegister q1) {
   std::stringstream ss;
-  ss << "qmeas.k  " << q1 << ",qzero, qzero, 0";
+  ss << "qmeas.k  $0, " << q1 << ", qzero, 0";
 
-  auto *funcType = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
+  auto *funcType = llvm::FunctionType::get(llvm::Type::getInt64Ty(context), false);
   bool hasSideEffect = true;
   auto asmDialect = llvm::InlineAsm::AD_ATT;
-  std::string constraints = "";
+  std::string constraints = "=r";
   auto *ia = llvm::InlineAsm::get(funcType, ss.str(), constraints, hasSideEffect, false, asmDialect);
   auto *result = builder.CreateCall(ia);
   result->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);

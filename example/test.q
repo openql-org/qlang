@@ -11,4 +11,5 @@ func main() {
   x = 0;  // Init
   y = x;  // telep
   write y;
+
 }
