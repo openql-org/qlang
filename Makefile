@@ -5,12 +5,13 @@ LIBS    =
 INCLUDE = -I ./include
 SRC_DIR = ./src
 OBJ_DIR = ./build
-OPTIMZ  = ./optimizer
+OPT_DIR = ./optimizer
 SOURCES = $(shell ls $(SRC_DIR)/*.cpp) 
 OBJS    = $(subst $(SRC_DIR),$(OBJ_DIR), $(SOURCES:.cpp=.o))
 TARGET  = qlang
 DEPENDS = $(OBJS:.o=.d)
 LLFILES = *.ll
+OPTFILE = libqot.so
 
 all: $(TARGET)
 
@@ -25,7 +26,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $< 
 
 clean:
-	$(RM) $(OBJS) $(TARGET) $(DEPENDS) $(LLFILES)
+	$(RM) $(OBJS) $(TARGET) $(DEPENDS) $(LLFILES) $(OPTFILE)
 
 run:
 # exp) spike -r2 -q2 pk ./exe
@@ -47,7 +48,7 @@ run-riscv:
 qopt:
 # llvm clang quantum optimizer for c/cpp language pass example.
 # exp) clang -S -Xclang -load -Xclang libqot.so test/test_q.c
-	g++ -shared -fPIC -o libqot.so $(OPTIMZ)/quantumOptimizerPass.cpp `llvm-config --cxxflags`
+	g++ -shared -fPIC -o $(OPTFILE) $(OPT_DIR)/quantumOptimizerPass.cpp `llvm-config --cxxflags`
 
 -include $(DEPENDS)
 
