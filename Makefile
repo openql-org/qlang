@@ -26,7 +26,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $< 
 
 clean:
-	$(RM) $(OBJS) $(TARGET) $(DEPENDS) $(LLFILES) $(OPTFILE)
+	$(RM) $(OBJS) $(OBJ_DIR)/* $(TARGET) $(DEPENDS) $(LLFILES) $(OPTFILE)
 
 run:
 # exp) spike -r2 -q2 pk ./exe
