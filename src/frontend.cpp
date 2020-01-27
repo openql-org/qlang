@@ -389,7 +389,7 @@ void Frontend::statement() {
     break;
   case TokenType::Writeln:
     nextToken();
-    writeFunc("%d");
+    writeFunc("\n");
     // builder.CreateCall(writelnFunc);
     break;
   default:;
