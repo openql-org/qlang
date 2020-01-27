@@ -6,8 +6,10 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm-c/Core.h>
+#include <llvm/IR/Attributes.h>
 #include <string>
 #include <sstream>
+#include <stdarg.h>
 
 #include "frontend.hpp"
 
@@ -26,7 +28,6 @@ llvm::Value* Frontend::qmeascall(QuantumRegister q1) {
   auto *ia = llvm::InlineAsm::get(funcType, ss.str(), constraints, hasSideEffect, false, asmDialect);
   auto *result = builder.CreateCall(ia);
   result->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);
-//  builder.CreateCall(writeFunc, std::vector<llvm::Value *>(1, result));
   return result;
 }
 
@@ -56,11 +57,50 @@ void Frontend::telepcall(QuantumRegister q1, QuantumRegister q2) {
   result->addAttribute(llvm::AttributeList::FunctionIndex, llvm::Attribute::NoUnwind);
 }
 
+
+void Frontend::writeFunc(const char *format, llvm::Value *v = NULL) {
+    auto *printfFunc = module->getFunction("printf");
+    if (!printfFunc) {
+        auto *Pty = llvm::PointerType::get(llvm::IntegerType::get(context, 8), 0);
+        auto *FuncTy = llvm::FunctionType::get(llvm::IntegerType::get(context, 32), true);
+        printfFunc = llvm::Function::Create(FuncTy, llvm::GlobalValue::ExternalLinkage, "printf", module);
+        printfFunc->setCallingConv(llvm::CallingConv::C);
+    }
+
+    auto *str = builder.CreateGlobalStringPtr(format);
+    std::vector <llvm::Value *> ArgsV;
+    ArgsV.push_back(str);
+    if (v)
+      ArgsV.push_back(v);
+/*
+    va_list ap;
+    va_start(ap, format);
+    for (const char* p = format; *p != '\0'; ++p) {
+        switch( *p ){
+        case 'd':
+            ArgsV.push_back(builder.getInt64(va_arg(ap, int)));
+            break;
+        case 'c':
+            ArgsV.push_back(builder.getInt8(va_arg(ap, int)));
+            break;
+        case 's':
+            ArgsV.push_back(builder.CreateGlobalStringPtr(va_arg(ap, char *)));
+            break;
+        default:
+            break;
+        }
+    }
+    va_end(ap);
+*/
+    builder.CreateCall(printfFunc, ArgsV);
+}
+
 Frontend::Frontend(const std::string &path)
     : lexer(path), context(), module(new llvm::Module("top", context)),
       builder(context) {
   cur_token = std::move(lexer.nextToken());
   peek_token = std::move(lexer.nextToken());
+  /*
   {
     std::vector<llvm::Type *> param_types(1, builder.getInt64Ty());
     auto *funcType =
@@ -74,6 +114,7 @@ Frontend::Frontend(const std::string &path)
     writelnFunc = llvm::Function::Create(
         funcType, llvm::Function::ExternalLinkage, "writeln", module);
   }
+  */
 }
 
 void Frontend::compile() {
@@ -343,11 +384,13 @@ void Frontend::statement() {
     return;
   case TokenType::Write:
     nextToken();
-    builder.CreateCall(writeFunc, std::vector<llvm::Value *>(1, expression()));
+    writeFunc("%d", expression());
+    // builder.CreateCall(writeFunc, std::vector<llvm::Value *>(1, expression()));
     break;
   case TokenType::Writeln:
     nextToken();
-    builder.CreateCall(writelnFunc);
+    writeFunc("%d");
+    // builder.CreateCall(writelnFunc);
     break;
   default:;
   }

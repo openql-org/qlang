@@ -40,6 +40,7 @@ public:
   void telepcall(QuantumRegister q1, QuantumRegister q2);
   void qooxcall(QuantumRegister q1);
   llvm::Value* qmeascall(QuantumRegister q1);
+  void writeFunc(const char *format, llvm::Value *v);
 
 private:
   void nextToken() {
@@ -60,8 +61,8 @@ private:
   llvm::IRBuilder<> builder;
 
   llvm::Function *curFunc;
-  llvm::Function *writeFunc;
-  llvm::Function *writelnFunc;
+  // llvm::Function *writeFunc;
+  // llvm::Function *writelnFunc;
 
   Lexer lexer;
 
