@@ -12,12 +12,20 @@ TARGET  = qlang
 DEPENDS = $(OBJS:.o=.d)
 LLFILES = *.ll
 OPTFILE = libqot.so
+UNAME = ${shell uname}
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS) $(LIBS)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS)
+	# Mac LLVM don't have RISC-V custom LLVM.
+ifeq ($(UNAME),Darwin)
+	clang -emit-llvm -S -O -o $(OBJ_DIR)/quantum.ll $(SRC_DIR)/quantum.c
+endif
+	# simple printf() func on Mac LLVM.
+ifeq ($(UNAME),Linux)
 	clang -emit-llvm -DQUANTUM -S -O -o $(OBJ_DIR)/quantum.ll $(SRC_DIR)/quantum.c
+endif
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@if [ ! -d $(OBJ_DIR) ]; \
