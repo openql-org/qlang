@@ -17,7 +17,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS) $(LIBS)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS)
-	clang -emit-llvm -S -O -o $(OBJ_DIR)/quantum.ll $(SRC_DIR)/quantum.c
+	clang -emit-llvm -DQUANTUM -S -O -o $(OBJ_DIR)/quantum.ll $(SRC_DIR)/quantum.c
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@if [ ! -d $(OBJ_DIR) ]; \
@@ -44,6 +44,7 @@ run-riscv:
 	# on risc-v target 
 	llc -march=riscv64 -relocation-model=pic -filetype=asm exe.ll -o exe.s
 	riscv64-unknown-elf-gcc exe.s -o exe -march=rv64imafdkc
+	spike -k -q4 -r2 pk ./exe
 
 qopt:
 # llvm clang quantum optimizer for c/cpp language pass example.
