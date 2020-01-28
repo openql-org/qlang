@@ -180,6 +180,7 @@ void Lexer::init_keywords() {
   keywords["return"] = TokenType::Return;
   keywords["write"] = TokenType::Write;
   keywords["writeln"] = TokenType::Writeln;
+  keywords["qfunc"] = TokenType::QFunc;
   keywords["odd"] = TokenType::Odd;
   keywords["int"] = TokenType::Integer;
   keywords["qint"] = TokenType::Qint;

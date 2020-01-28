@@ -27,6 +27,7 @@ enum class Instruction {
   GreaterEq,
   Write,
   Writeln,
+  QFunc,
 };
 
 static std::ostream &operator<<(std::ostream &out, const Instruction inst) {
@@ -75,6 +76,8 @@ static std::ostream &operator<<(std::ostream &out, const Instruction inst) {
     return out << "Write";
   case Instruction::Writeln:
     return out << "Writeln";
+  case Instruction::QFunc:
+    return out << "QFunc";
   }
 }
 
@@ -109,6 +112,7 @@ static size_t operand_size(Instruction inst) {
   case Instruction::GreaterEq:
   case Instruction::Write:
   case Instruction::Writeln:
+  case Instruction::QFunc:
     return 0;
   }
 }

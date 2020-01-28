@@ -18,6 +18,7 @@ enum class TokenType {
   Return,
   Write,
   Writeln,
+  QFunc,
   Odd,
   Qint,
 
@@ -87,6 +88,8 @@ static std::ostream &operator<<(std::ostream &out, const TokenType type) {
     return out << "Write";
   case TokenType::Writeln:
     return out << "Writeln";
+  case TokenType::QFunc:
+    return out << "QFunc";
   case TokenType::Odd:
     return out << "Odd";
 

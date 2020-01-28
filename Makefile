@@ -17,7 +17,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS) $(LIBS)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS)
-	clang -emit-llvm -S -O -o $(OBJ_DIR)/write.ll $(SRC_DIR)/write.c
+	clang -emit-llvm -S -O -o $(OBJ_DIR)/quantum.ll $(SRC_DIR)/quantum.c
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@if [ ! -d $(OBJ_DIR) ]; \
@@ -32,14 +32,14 @@ run:
 # exp) spike -r2 -q2 pk ./exe
 	# optimize frontend IR with opt ls
 	./qlang -O3 example/test.q 
-	llvm-link out.ll ./build/write.ll -S -o ./build/linked.ll
+	llvm-link out.ll ./build/quantum.ll -S -o ./build/linked.ll
 	opt -S -mem2reg ./build/linked.ll > exe.ll
 	lli exe.ll
 
 run-riscv:
 	# optimize frontend IR with opt ls
 	./qlang -O3 example/test.q 
-	llvm-link out.ll ./build/write.ll -S -o ./build/linked.ll
+	llvm-link out.ll ./build/quantum.ll -S -o ./build/linked.ll
 	opt -S -mem2reg ./build/linked.ll > exe.ll
 	# on risc-v target 
 	llc -march=riscv64 -relocation-model=pic -filetype=asm exe.ll -o exe.s

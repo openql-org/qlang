@@ -100,21 +100,13 @@ Frontend::Frontend(const std::string &path)
       builder(context) {
   cur_token = std::move(lexer.nextToken());
   peek_token = std::move(lexer.nextToken());
-  /*
   {
-    std::vector<llvm::Type *> param_types(1, builder.getInt64Ty());
-    auto *funcType =
-        llvm::FunctionType::get(builder.getInt64Ty(), param_types, false);
-    writeFunc = llvm::Function::Create(
-        funcType, llvm::Function::ExternalLinkage, "write", module);
-  }
-
-  {
+    // std::vector<llvm::Type *> param_types(1, builder.getInt64Ty());
+    // auto *funcType = llvm::FunctionType::get(builder.getInt64Ty(), param_types, false);
     auto *funcType = llvm::FunctionType::get(builder.getInt64Ty(), false);
-    writelnFunc = llvm::Function::Create(
-        funcType, llvm::Function::ExternalLinkage, "writeln", module);
+    quantumFunc = llvm::Function::Create(
+        funcType, llvm::Function::ExternalLinkage, "qfunc", module);
   }
-  */
 }
 
 void Frontend::compile() {
@@ -385,12 +377,15 @@ void Frontend::statement() {
   case TokenType::Write:
     nextToken();
     writeFunc("%d", expression());
-    // builder.CreateCall(writeFunc, std::vector<llvm::Value *>(1, expression()));
     break;
   case TokenType::Writeln:
     nextToken();
     writeFunc("\n");
-    // builder.CreateCall(writelnFunc);
+    break;
+  case TokenType::QFunc:
+    nextToken();
+    builder.CreateCall(quantumFunc);
+    // builder.CreateCall(quantumFunc, std::vector<llvm::Value *>(1, expression()));
     break;
   default:;
   }
