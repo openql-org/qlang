@@ -11,11 +11,8 @@ namespace {
     quantumOptimizerPass() : FunctionPass(ID) {}
 
     virtual bool runOnFunction(Function &F) {
-//       errs() << "function called '" << F.getName() << "'\n";
       for (llvm::BasicBlock &BB : F) {
-//         errs() << "Enter the Block: " << BB << "\n";
         for (llvm::Instruction &II: BB) {
-//           errs() << "        " << II << "\n";
         }
       }
       return false;
