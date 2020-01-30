@@ -35,7 +35,7 @@
 #include <string>
 #include "frontend.hpp"
 #include "option_parser.h"
-#include "quantumOptimizerPass.h"
+#include "quantumDupOptimizerPass.h"
 
 using namespace qlang;
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
   Builder.populateModulePassManager(pm);
 
   // here is quantum optimizer pass
-  registerquantumOptimizerPass(Builder, pm);
+  registerquantumDupOptimizerPass(Builder, pm);
 
   // generate bitcode
   std::error_code error_info;
