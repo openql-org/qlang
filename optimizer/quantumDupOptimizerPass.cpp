@@ -24,6 +24,10 @@ namespace {
           llvm::raw_string_ostream rso(str);
           II.print(rso);
 
+          // remove comment
+          int npos = str.find("#");
+          if (npos > 0) str.erase(npos - 1);
+
           // just simple duplicate gate only now.
           for (std::string &v : dupEraseQuantumAsm) {
             std::size_t found = str.find(v);
