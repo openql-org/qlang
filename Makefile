@@ -57,7 +57,7 @@ run-riscv:
 qopt:
 # llvm clang quantum optimizer for c/cpp language pass example.
 # exp) clang -S -Xclang -load -Xclang libqot.so test/test_q.c
-	g++ -shared -fPIC -o $(OPTFILE) $(OPT_DIR)/quantumOptimizerPass.cpp `llvm-config --cxxflags`
+	g++ -shared -fPIC -o $(OPTFILE) $(OPT_DIR)/quantumDupOptimizerPass.cpp `llvm-config --cxxflags`
 
 -include $(DEPENDS)
 
