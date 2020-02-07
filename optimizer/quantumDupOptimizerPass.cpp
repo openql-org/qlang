@@ -15,7 +15,7 @@ namespace {
     quantumDupOptimizerPass() : FunctionPass(ID) {}
     std::stack<Instruction *> dupErasekList;
     std::multimap<std::string, Instruction *> dupErasekMap;
-    std::vector<std::string> dupEraseQuantumAsm = {"qooz.k"};
+    std::vector<std::string> dupEraseQuantumAsm = {"qoox.k"};
 
     virtual bool runOnFunction(Function &F) {
       for (llvm::BasicBlock &BB : F) {

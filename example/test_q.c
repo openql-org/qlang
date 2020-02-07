@@ -6,8 +6,9 @@ int main(int argc, char* argv[]) {
     int ret2 = 0;
 
     // call qooz for duplicate optimizer test.
-    asm volatile( "qooz.k qzero,qt1,qzero,1");
-    asm volatile( "qooz.k qzero,qt1,qzero,1");
+    asm volatile( "qoox.k qzero,qt1,qzero,1");
+    asm volatile( "qoox.k qzero,qt1,qzero,1");
+    asm volatile( "qoox.k qzero,qt1,qzero,1");
 
     // call qooh
     asm volatile( "qooh.k qzero,qt1,qzero,1");

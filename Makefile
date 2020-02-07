@@ -59,6 +59,14 @@ qopt:
 # exp) clang -S -Xclang -load -Xclang libqot.so example/test_q.c
 	g++ -shared -fPIC -o $(OPTFILE) $(OPT_DIR)/quantumDupOptimizerPass.cpp `llvm-config --cxxflags`
 
+qopt-run:
+	clang -Xclang -load -Xclang libqot.so -target riscv64-unknown-linux-gnu -c example/test_q.c -emit-llvm -o test_q.bc
+	llvm-dis test_q.bc
+	llc -march=riscv64 -relocation-model=pic -filetype=asm test_q.bc  -o test_q.s
+	riscv64-unknown-elf-gcc test_q.s -o test_q -march=rv64imafdkc
+	spike -k -q4 -r2 pk ./exe
+
+
 -include $(DEPENDS)
 
 .PHONY: all cleanls
