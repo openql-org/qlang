@@ -1,5 +1,5 @@
 # qlang
-simple program language on LLVM for quantum computing.
+simple program language for quantum computing on LLVM version 9.0/10.0.
 
 ## environments
 ```
