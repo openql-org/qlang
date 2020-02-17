@@ -141,7 +141,7 @@ void Frontend::block(llvm::Function *func) {
       auto *alloca =
           builder.CreateAlloca(builder.getInt64Ty(), 0, itr->getName());
       builder.CreateStore(itr, alloca);
-      ident_table.appendVar(itr->getName(), alloca);
+      ident_table.appendVar(itr->getName().str(), alloca);
       itr++;
     }
     for (const auto &var : vars) {      
